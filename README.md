@@ -1,7 +1,7 @@
 # tp-arboles
 
-> gcc -c abb.h abb.c
+> gcc -c arbol.h arbol.c
 > 
-> gcc -gstabs -Wall -o main mainABB.c abb.o
+> gcc -gstabs -Wall -o main main.c arbol.o
 > 
 > ./main
