@@ -1,5 +1,5 @@
-#ifndef __ARBOL_H__
-#define __ARBOL_H__
+#ifndef __ABB_H__
+#define __ABB_H__
 
 #include <stddef.h>
 
@@ -15,7 +15,6 @@ int estadoPareja;
 } _Pareja;
 typedef _Pareja *Pareja;
 
-
 typedef struct _TNodo {
   void *dato;
   struct _TNodo *izq, *der;
@@ -26,18 +25,11 @@ Arbol create();
 
 int isEmpty(Arbol a);
 
-typedef int (*Comparar) ( void * dato1, void * dato2 );
+typedef int (*Comparar) ( void * dato1, int dato2 );
 
-Arbol agrega(Arbol a, Judoca dato, Comparar c);
+Arbol agrega(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, Comparar c);
 
 void muestraPreOrder(Arbol a);
-
-typedef void (*Destruir) ( void * dato );
-
-
-void arbol_destruir ( Arbol arbolN, Destruir d );
-
-void cargar_agenda(Pareja* pareja);
 
 void testJudoca();
 
