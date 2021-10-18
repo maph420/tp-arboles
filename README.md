@@ -4,4 +4,4 @@
 > 
 > gcc -gstabs -Wall -o main main.c arbol.o
 > 
-> ./main
+> ./main archentrada.txt
