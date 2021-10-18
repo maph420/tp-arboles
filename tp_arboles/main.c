@@ -1,4 +1,3 @@
-  
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,23 +10,42 @@ void assign(char* line, Judoca judocaToAssign) {
 }
 
 
-int funcionComparar ( void* dato1, int dato2 ) {
+int funcionCompararEdadesJudoca ( void* dato1, int dato2 ) {
     return ( ((Judoca)dato1)->edad >= (int)dato2 ) ? 1 : 0 ; //>= ya que por convencion si un nodo es igual a otro, se coloca a la izquierda en el arbol
 }
 
 
-
-int funcionComparaNodos(void* dato1, Judoca dato2) {
+int funcionComparaNodos(void* dato1, Judoca dato2, Arbol* a1, Arbol* a2) {
     int delta = ( (((Judoca)dato1)->edad) >= ((Judoca)dato2)->edad ) ? ((Judoca)dato1)->edad - ((Judoca)dato2)->edad : ((Judoca)dato2)->edad - ((Judoca)dato1)->edad;
-    if (delta<=2) {
-        printf("Se encontro matcheo (delta: %d)\n",delta);
-        printf("Matcheo entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
-        return 1;
+    if(((Judoca)dato1)->edad >= 18 && ((Judoca)dato2)->edad >= 18)
+        if (delta<=2) {
+            printf("Se encontro matcheo (delta: %d)",delta);
+            printf("    entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
+            //*a1 = elimina(*a1,((Judoca)dato1)->edad);
+            //*a2 = elimina(*a2,((Judoca)a2)->edad);
+            /*printf("arbol1:\n");
+            muestraPreOrder(*a1);
+            printf("arbol2:\n");
+            muestraPreOrder(*a2);*/
+            return 1;
     }
         else {
             //printf("delta excedido, %d (%s y %s)\n",delta,((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
             return 0;
         }
+    else if(((Judoca)dato1)->edad < 18 && ((Judoca)dato2)->edad < 18)
+            if (delta<=1) {
+            printf("Se encontro matcheo (delta: %d)\n",delta);
+            printf("Matcheo entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
+            //*a1 = elimina(*a1,((Judoca)dato1)->edad);
+            //*a2 = elimina(*a2,((Judoca)a2)->edad);
+            return 1;
+    }
+            else {
+                //printf("delta excedido, %d (%s y %s)\n",delta,((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
+                return 0;
+            }
+    else return 0;
 }
 
 
@@ -66,11 +84,11 @@ int line_count = 0;
             else {
                     if(arb==1) {
                         assign(line,judoca);
-                        *arbolEquipo1 = agrega(*arbolEquipo1,judoca->nombre,judoca->apellido,judoca->edad,funcionComparar);
+                        *arbolEquipo1 = agrega(*arbolEquipo1,judoca->nombre,judoca->apellido,judoca->edad,funcionCompararEdadesJudoca);
                     }
                     else if(arb==2) {
                         assign(line,judoca);
-                        *arbolEquipo2 = agrega(*arbolEquipo2,judoca->nombre,judoca->apellido,judoca->edad,funcionComparar);
+                        *arbolEquipo2 = agrega(*arbolEquipo2,judoca->nombre,judoca->apellido,judoca->edad,funcionCompararEdadesJudoca);
                     }
                     else 
                         return -1; //no pudo ser leido ningun arbol
@@ -111,4 +129,5 @@ compararArboles(a1,a2,funcionComparaNodos);
 //testJudoca();
 
 }
+
 
