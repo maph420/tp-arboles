@@ -31,20 +31,20 @@ void muestraPreOrder(Arbol a){
 
 
 //compara Judoca dado con cada uno de los nodos del arbol, devuelve 1 en caso de matchear, sino 0
-void compararNodo(Arbol a, CompararNodos c, Judoca nodoJudoca) {
+void compararNodo(Arbol a, CompararNodos c, Judoca nodoJudoca, Arbol* a2) {
 	if(!isEmpty(a)) {
-		if(c(a->dato,nodoJudoca)) {
+		if(c(a->dato,nodoJudoca,&a,a2)) { //el if asi como esta no hace nada dentro del parentesis, pero ejecuta c()
 			//return 1; esto puede servir luego, lo de retornar para que no siga buscando, ya que ya habria encontrado un matcheo valido
 		}
-			compararNodo(a->izq,c,nodoJudoca);
-			compararNodo(a->der,c,nodoJudoca);
+			compararNodo(a->izq,c,nodoJudoca, a2);
+			compararNodo(a->der,c,nodoJudoca, a2);
 	}
 	//return 0;
 }
 
 void compararArboles(Arbol a1, Arbol a2, CompararNodos c) { //recorremos arbol a2, pasandole en cada vuelta un nodo distinto a la funcion que analiza r/arbol1
 	if(!isEmpty(a2)) {
-		compararNodo(a1,c,(Judoca)a2->dato);
+		compararNodo(a1,c,(Judoca)a2->dato, &a2); //compara nodo actual de a2 con cada nodo de a1 (que se llama en comparar nodo)
 		compararArboles(a1,a2->izq,c);
 		compararArboles(a1,a2->der,c);	
 	}
@@ -80,13 +80,13 @@ Arbol agrega(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, 
 /*borrar despues esta funcion*/
 void testJudoca() {
 
-Judoca j=NULL;
-Judoca j2=NULL;
-Judoca j3=NULL;
+//Judoca j=NULL;unused 
+//Judoca j2=NULL;unused
+//Judoca j3=NULL;
 
 
-char bufNombre[50];
-char bufApe[50];
+//char bufNombre[50];unused
+//char bufApe[50];unused
 
 Arbol a = create();
 
@@ -96,4 +96,60 @@ a = agrega(a,"nombre3","apellido3",15,miComparar);
 
 printf("muestraPreOrder:\n");
 muestraPreOrder(a);
+}
+
+
+Arbol buscaMayorDeMenores(Arbol a){ /*el elemento mas a la derecha de la rama izquierda*/
+	if  (a->izq == NULL) {
+    	return NULL;
+  	}
+  	else {
+	    Arbol t;
+    	for(t = a->izq; t->der != NULL; t = t->der);
+    	return t;
+  	}
+}
+
+
+// el typecast (int)a->dato no sirve (da basura) 
+
+Arbol elimina(Arbol a, int dato) {
+	if (isEmpty(a)) return NULL;
+	if (((Judoca)a->dato)->edad != dato) {
+		if (((Judoca)a->dato)->edad > dato) {
+			printf("- %d mayor a %d, izquierda\n",((Judoca)a->dato)->edad,dato);
+			a->izq = elimina(a->izq, dato);
+		}
+    	else {
+			printf("- %d menor a %d, derecha\n",((Judoca)a->dato)->edad,dato);
+			a->der = elimina(a->der, dato);
+		}
+  	} 
+  	else {
+  	//Estoy en el Nodo que se desea eliminar
+  		//Caso 1: No tiene hijos
+  		if (isEmpty(a->izq) && isEmpty(a->der))	 {
+			free(a);
+  			a = NULL;
+  			return a;
+		  }
+  		
+  		//Caso 2: Un hijo 
+  		else if (isEmpty(a->izq) || isEmpty(a->der)) {
+  			Arbol t = isEmpty(a->izq)? a->der : a->izq;
+  			free(a);
+  			a = t;
+  			return a;
+  		}
+  		//Caso 3: 2 hijos
+  		else {
+  			//Encuentro el nodo que tengo que poner en su lugar, en este caso, es el mayor de los menores
+  			Arbol t = buscaMayorDeMenores(a);
+  			a->dato = t->dato;
+  			//Borro el nodo duplicado que quedó
+  			a->izq=elimina(a->izq, (int)t->dato);
+		  }
+
+  	}
+  	return a;
 }
