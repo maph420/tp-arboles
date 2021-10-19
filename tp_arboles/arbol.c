@@ -48,10 +48,7 @@ void compararArboles(Arbol a1, Arbol a2, CompararNodos c) { //recorremos arbol a
 		compararArboles(a1,a2->izq,c);
 		compararArboles(a1,a2->der,c);	
 	}
-
 }
-
-
 
 
 Arbol agrega(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, Comparar c) { //Judoca es un puntero !!!, pasar datos como args separados
@@ -96,4 +93,61 @@ a = agrega(a,"nombre3","apellido3",15,miComparar);
 
 printf("muestraPreOrder:\n");
 muestraPreOrder(a);
+}
+
+
+Arbol buscaMayorDeMenores(Arbol a){ /*el elemento mas a la derecha de la rama izquierda*/
+	if  (a->izq == NULL) {
+    	return NULL;
+  	}
+  	else {
+	    Arbol t;
+    	for(t = a->izq; t->der != NULL; t = t->der);
+    	return t;
+  	}
+}
+
+
+Arbol elimina(Arbol a, int dato) {
+	if (isEmpty(a)) return NULL;
+	if ( ((Judoca)a->dato)->edad != dato ) {
+		//printf("%d != %d\n",((Judoca)a->dato)->edad,dato);
+		if (((Judoca)a->dato)->edad > dato) {
+			//printf("- %d mayor a %d, izquierda\n",((Judoca)a->dato)->edad,dato);
+			//printf("izquierda (%d > %d)\n",((Judoca)a->dato)->edad,dato);
+			a->izq = elimina(a->izq, dato);
+		}
+    	else {	
+			//printf("- %d menor a %d, derecha\n",((Judoca)a->dato)->edad,dato);
+			//printf("derecha (%d < %d)\n",((Judoca)a->dato)->edad,dato);
+			a->der = elimina(a->der, dato);
+		}
+  	} 
+  	else {
+  	//Estoy en el Nodo que se desea eliminar
+  		//Caso 1: No tiene hijos
+  		if (isEmpty(a->izq) && isEmpty(a->der))	 {
+			free(a);
+  			a = NULL;
+			printf("despues de la asignacion s/hijos\n");
+  			return a;
+		  }
+  		
+  		//Caso 2: Un hijo 
+  		else if (isEmpty(a->izq) || isEmpty(a->der)) {
+  			Arbol t = (isEmpty(a->izq) ? a->der : a->izq);
+  			free(a);
+  			a = t;
+  			return a;
+  		}
+  		//Caso 3: 2 hijos
+  		else {
+  			//Encuentro el nodo que tengo que poner en su lugar, en este caso, es el mayor de los menores
+  			Arbol t = buscaMayorDeMenores(a);
+  			((Judoca)a->dato)->edad = ((Judoca)t->dato)->edad;
+  			//Borro el nodo duplicado que quedó
+  			a->izq=elimina(a->izq, ((Judoca)t->dato)->edad);
+		  }
+  	}
+  	return a;
 }
