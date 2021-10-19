@@ -43,4 +43,10 @@ void compararArboles(Arbol a1, Arbol a2, CompararNodos c);
 
 void testJudoca();
 
+Arbol elimina(Arbol a, int dato);
+
+int asignarParejas(Arbol* a1, Arbol* a2, CompararNodos c); 
+//retorna 1 si algun judoca de cualquiera de los arboles se quedo sin pareja (aun si ni siquiera pudieran jugar)
+// 0 si todos tienen pareja y las parejas que no cumplen las condiciones tienen justificado el porqué
+
 #endif /* __ARBOL_H__ */
