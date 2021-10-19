@@ -1,4 +1,3 @@
-  
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,15 +18,23 @@ int funcionComparar ( void* dato1, int dato2 ) {
 
 int funcionComparaNodos(void* dato1, Judoca dato2) {
     int delta = ( (((Judoca)dato1)->edad) >= ((Judoca)dato2)->edad ) ? ((Judoca)dato1)->edad - ((Judoca)dato2)->edad : ((Judoca)dato2)->edad - ((Judoca)dato1)->edad;
-    if (delta<=2) {
-        printf("Se encontro matcheo (delta: %d)\n",delta);
-        printf("Matcheo entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
-        return 1;
-    }
-        else {
-            //printf("delta excedido, %d (%s y %s)\n",delta,((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
-            return 0;
+
+    if( ((Judoca)dato1)->edad >= 18 && ((Judoca)dato2)->edad >= 18 ) {
+        if (delta<=2) {
+            printf("Se encontro matcheo (delta: %d)",delta);
+            printf("-entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
+            return 1;
         }
+    }
+
+    else if( ((Judoca)dato1)->edad < 18 && ((Judoca)dato2)->edad < 18 ) {
+        if (delta<=1) {
+            printf("Se encontro matcheo (delta: %d)",delta);
+            printf("-entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
+            return 1;
+        }
+}
+    return 0;
 }
 
 
@@ -44,7 +51,8 @@ FILE* arch = fopen(nombreArchivo, "r");
 
 if(!arch) {
     printf("no se pudo abrir archivo\n");
-    return -1;
+    return 0;
+    //return -1;
 }
     //char primerLinea[LONGITUD_MAX_LINEA];
     //fscanf(arch, "%[^\n]", primerLinea);
@@ -109,6 +117,11 @@ muestraPreOrder(a2);
 printf("-----\n");
 compararArboles(a1,a2,funcionComparaNodos);
 //testJudoca();
-
+printf("elimina\n");
+a1 = elimina(a1,18);
+printf("muestraPreOrder despues de eliminar:\n");
+muestraPreOrder(a1);
+    return 0;
 }
+
 
