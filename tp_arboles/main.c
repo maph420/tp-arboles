@@ -10,117 +10,91 @@ void assign(char* line, Judoca judocaToAssign) {
             judocaToAssign->edad = atoi(strtok(NULL,"\n"));
 }
 
-int funcionComparar ( void* dato1, int dato2 ) {
-    return ( ((Judoca)dato1)->edad >= (int)dato2 ) ? 1 : 0 ; //>= ya que por convencion si un nodo es igual a otro, se coloca a la izquierda en el arbol
+int funcionCompararJudocas ( void* dato1, int dato2 ) {
+    return ( ((Judoca)dato1)->edad >= (int)dato2) ? 1 : 0 ; //>= ya que por convencion si un nodo es igual a otro, se coloca a la izquierda en el arbol
 }
 
-int funcionCompararPareja (void* dato1, int dato2) {
+int funcionCompararJudocas2 ( void* dato1, int dato2 ) {
+    return (  (int)dato2)>= ((Judoca)dato1)->edad ? 1 : 0 ; //>= ya que por convencion si un nodo es igual a otro, se coloca a la izquierda en el arbol
+}
+
+int funcionCompararParejas (void* dato1, int dato2) {
     return ( ((Pareja)dato1)->estadoPareja >= (int)dato2 ) ? 1 : 0 ;
 }
 
 
-
-void encolarArbol(Cola cola, Arbol arbol_a_encolar) {
-    if(!(isEmpty(arbol_a_encolar))) {
-        cola_encolar(cola,arbol_a_encolar->dato);
-        encolarArbol(cola,arbol_a_encolar->izq);
-        encolarArbol(cola,arbol_a_encolar->der);
-    }
-}
-
-
-
 int deltaEdades(void* dato1, void* dato2) {
 int d = ( (((Judoca)dato1)->edad) >= ((Judoca)dato2)->edad ) ? ((Judoca)dato1)->edad - ((Judoca)dato2)->edad : ((Judoca)dato2)->edad - ((Judoca)dato1)->edad;
-return d;
+    return d;
 }
 
-
-int compararArboles(Arbol a1, Arbol a2, CompararNodos c, Arbol* arbolDeParejas) { //recorremos arbol a2, pasandole en cada vuelta un nodo distinto a la funcion que analiza r/arbol1
-Cola cola_a1 = cola_crear();
-Cola cola_a2 = cola_crear();
-
-
-
-    /*printf("arbol1\n");
-    muestraPreOrder(a1);
-    printf("arbol2\n");
-    muestraPreOrder(a2);*/
-
-encolarArbol(cola_a1,a1);
-
-Judoca judocaTop_a1, judocaTop_a2, bestMatch;
-//int cond=0, encontroEnArbol1=0;
-
-while(cola_a1->primero != -1) { //esto recorre la cola con los elementos de arbol 1
-    //encontroEnArbol1=0;
-    judocaTop_a1 = ((Judoca)cola_a1->datos[cola_a1->primero]);
-    encolarArbol(cola_a2,a2);
-    bestMatch = ((Judoca)cola_a2->datos[cola_a2->primero]);
-
-    while(cola_a2->primero != -1) { //aca adentro puedo comparar los distintos elem de las colas
-
-        judocaTop_a2 = ((Judoca)cola_a2->datos[cola_a2->primero]);
-
-        printf("comparo edad %s (%d) con edad %s (%d)\n",judocaTop_a1->nombre,judocaTop_a1->edad,judocaTop_a2->nombre,judocaTop_a2->edad);
-        printf("delta:%d\n",deltaEdades(judocaTop_a1,judocaTop_a2));
-        if(deltaEdades(judocaTop_a1,judocaTop_a2) < deltaEdades(judocaTop_a1,bestMatch)) {
-
-            printf("antiguo best match: %s(%d), nuevo best match: %s(%d)\n",bestMatch->nombre,bestMatch->edad,judocaTop_a2->nombre,judocaTop_a2->edad);
-            bestMatch = judocaTop_a2;
-        }
-            
-
-        cola_desencolar(cola_a2);
-
+int obtenerEstadoJudoca(void* j1, void* j2) {
+    if ( ( ((Judoca)j1)->edad >= 18 && ((Judoca)j2)->edad < 18) || ( ((Judoca)j1)->edad < 18 && ((Judoca)j2)->edad >=18 ) ) {
+        return 1;
     }
-    Pareja p = malloc(sizeof(_Pareja));
-    p->participante1 = judocaTop_a1;
-    p->participante2 = bestMatch;
-    p->estadoPareja = 1;
-    printf("---pareja formada: %s(%d) y %s(%d)\n",p->participante1->nombre,p->participante1->edad,p->participante2->nombre,p->participante2->edad);
-    *arbolDeParejas = agrega_pareja(*arbolDeParejas,judocaTop_a1,bestMatch,1,funcionCompararPareja);
-
-    a1 = elimina(a1,judocaTop_a1);
-    a2 = elimina(a2,bestMatch);
-
-    cola_desencolar(cola_a1);
+    else if ( ( ((Judoca)j1)->edad <18 && ((Judoca)j2)->edad <18 ) && (deltaEdades((Judoca)j1,(Judoca)j2) > 1) ) {
+        return 2;
+    }
+    else if ( ( ((Judoca)j1)->edad >=18 && ((Judoca)j2)->edad >=18 ) && (deltaEdades((Judoca)j1,(Judoca)j2) > 2) ) {
+        return 3;
+    }
+    else {
+        return 0;
+    }
 }
 
-    
-    printf("\narbol de parejas\n");
-    muestraPreOrderParejas(*arbolDeParejas);
-
-    printf("termina\n");
-	return 0;
-}
-
-
-
-int funcionComparaNodos(void* dato1, void* dato2) {
-
-    int delta = ( (((Judoca)dato1)->edad) >= ((Judoca)dato2)->edad ) ? ((Judoca)dato1)->edad - ((Judoca)dato2)->edad : ((Judoca)dato2)->edad - ((Judoca)dato1)->edad;
-
-    if( ((Judoca)dato1)->edad >= 18 && ((Judoca)dato2)->edad >= 18 ) {
-        if (delta<=2) {
-            printf("Se encontro matcheo (delta: %d)",delta);
-            printf("-entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);           
-            
-
-            printf("retorna la funcion\n");
-            return 1;
+Pareja parejaMinDiferenciaEdad (Judoca nodoAComparar, Arbol a) {
+    Pareja p;
+    if (!isEmpty(a)) { //recorro arbol 1 y me fijo el mejor matcheo con un elemento de arbol 2, sino el elemento mas chico
+        if(obtenerEstadoJudoca((Judoca)a->dato,(Judoca)nodoAComparar) == 0 || ( (isEmpty(a->izq) && (isEmpty(a->der))) )) {
+        p = malloc(sizeof(_Pareja));
+        p->participante1 = nodoAComparar;
+        p->participante2 = (Judoca)a->dato;
+        p->estadoPareja = obtenerEstadoJudoca((Judoca)a->dato,(Judoca)nodoAComparar);
+        return p;
+        }
+        else {
+            if (nodoAComparar->edad >= ((Judoca)a->dato)->edad) {
+                return parejaMinDiferenciaEdad(nodoAComparar,a->izq);
+            }
+            else {
+                return parejaMinDiferenciaEdad(nodoAComparar,a->der);
+            }
+                
         }
     }
-
-    else if( ((Judoca)dato1)->edad < 18 && ((Judoca)dato2)->edad < 18 ) {
-        if (delta<=1) {
-            printf("Se encontro matcheo (delta: %d)",delta);
-            printf("-entre %s y %s\n",((Judoca)dato1)->nombre,((Judoca)dato2)->nombre);
-            return 1;
+        else {
+            return NULL; //esto ocurre si alguien se queda sin pareja
         }
+            
 }
-    return 0;
+
+void formarParejas(Arbol* a1, Arbol* a2, Arbol* a_resultante) {
+    /*printf("arbol a1:\n"); descomentar para ver recorrido de arboles (1/3)
+    muestraPreOrder(*a1);
+    printf("arbol a2:\n");
+    muestraPreOrder(*a2);*/
+    Pareja p = parejaMinDiferenciaEdad((Judoca)((*a1)->dato),*a2);
+    if(!p) return; //se llego al maximo numero de parejas formadas (lo restante de a1 o de a2 se quedara sin pareja)
+    //printf("!!pareja encontrada: %s y %s\n",(p->participante1)->nombre,(p->participante2)->nombre); descomentar para ver recorrido de arboles (2/3)
+
+
+    *a_resultante = agrega_pareja(*a_resultante,p->participante1,p->participante2,p->estadoPareja,funcionCompararParejas);
+
+    /*printf("elimino %s de a1\n",((Judoca)p->participante1)->nombre); descomentar para ver recorrido de arboles (3/3)
+    printf("elimino %s de a2\n",((Judoca)p->participante2)->nombre);*/
+    *a1 = elimina(*a1,(Judoca)p->participante1);
+    *a2 = elimina(*a2,(Judoca)p->participante2);
+
+    if( (*a1) == NULL || (*a2) == NULL ) {
+        return;
+    }
+    else {
+        formarParejas(a1,a2,a_resultante);
+    }
+        
 }
+
 
 
 //declaro Arbol como puntero para modificar la referencia global, no solo la local de la función
@@ -131,15 +105,13 @@ judoca = malloc(sizeof(_Judoca));
 
 char line[LONGITUD_MAX_LINEA];
 
-/*abrimos el archivo, con permisos de lectura*/
+// abrimos el archivo, con permisos de lectura
 FILE* arch = fopen(nombreArchivo, "r");
 
 if(!arch) {
     printf("no se pudo abrir archivo\n");
     return -1;
 }
-    //char primerLinea[LONGITUD_MAX_LINEA];
-    //fscanf(arch, "%[^\n]", primerLinea);
 
 int arb = 0;
 int line_count = 0;
@@ -148,21 +120,21 @@ int line_count = 0;
         /*si aparece la cadena Equipo1, la salteamos (queremos almacenar lo que le sigue)*/
         if ( ! strcmp(line,"Equipo1:\n")) {
             arb=1;
-            continue;
+            continue; //reemplazar por bandera
         }
         /*si aparece la cadena Equipo2, la salteamos (queremos almacenar lo que le sigue)*/
         else if (! strcmp(line,"Equipo2:\n")) {
             arb=2;
-            continue;
+            continue; //reemplazar por bandera
         }
             else {
                     if(arb==1) {
                         assign(line,judoca);
-                        *arbolEquipo1 = agrega(*arbolEquipo1,judoca->nombre,judoca->apellido,judoca->edad,funcionComparar);
+                        *arbolEquipo1 = agrega(*arbolEquipo1,judoca->nombre,judoca->apellido,judoca->edad,funcionCompararJudocas);
                     }
                     else if(arb==2) {
                         assign(line,judoca);
-                        *arbolEquipo2 = agrega(*arbolEquipo2,judoca->nombre,judoca->apellido,judoca->edad,funcionComparar);
+                        *arbolEquipo2 = agrega(*arbolEquipo2,judoca->nombre,judoca->apellido,judoca->edad,funcionCompararJudocas);
                     }
                     else 
                         return -1; //no pudo ser leido ningun arbol
@@ -187,10 +159,10 @@ int line_count = 0;
 //argv[2]->nombre arch salida
 
 int main(int argc, char* argv[]) {
-    Arbol a1, a2, arbol_parejas;
+    Arbol a1, a2, arbolparejas;
     a1 = create();
     a2 = create();
-    arbol_parejas = create();
+    arbolparejas = create();
 
     if(leerArch(argv[1],&a1,&a2)<0) {
         printf("Hubo un problema al leer el archivo\n");
@@ -201,8 +173,18 @@ printf("-----\n");
 muestraPreOrder(a2);
 printf("-----\n");
 
-compararArboles(a1,a2,funcionComparaNodos,&arbol_parejas);
+formarParejas(&a1,&a2,&arbolparejas);
 
+printf("parejas formadas:\n");
+muestraPreOrderParejas(arbolparejas);
+if(a1) {
+    printf("--------------\nelementos sin matcheo de a1\n");
+    muestraPreOrder(a1);
+}
+if(a2) {
+    printf("--------------\nelementos sin matcheo de a2\n");
+    muestraPreOrder(a2);
+}
     printf("\nprograma retorna\n");
     return 0;
 }
