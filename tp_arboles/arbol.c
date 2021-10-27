@@ -63,6 +63,7 @@ Arbol agrega(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, 
 	return a;
 }
 
+//esto en main.c o arbol.c ?
 Arbol agrega_pareja(Arbol a, Judoca p1, Judoca p2, int estadoPareja, Comparar c) { 
 
 	if (isEmpty(a)) {
@@ -88,8 +89,8 @@ Arbol agrega_pareja(Arbol a, Judoca p1, Judoca p2, int estadoPareja, Comparar c)
 
 
 
-
-Arbol buscaMayorDeMenores(Arbol a){ /*el elemento mas a la derecha de la rama izquierda*/
+//el elemento mas a la derecha de la rama izquierda
+Arbol buscaMayorDeMenores(Arbol a){ 
 	if  (a->izq == NULL) {
     	return NULL;
   	}
@@ -139,28 +140,9 @@ Arbol elimina(Arbol a, void* dato) {
 		  }
   	}
 	  else {
-		  a->izq = elimina(a->izq, dato); //(?)
+		  a->izq = elimina(a->izq, dato); 
 	  }
 
 }
   	return a;
-}
-
-
-/*borrar despues esta funcion*/
-void testJudoca() {
-
-Judoca j=NULL;
-Judoca j2=NULL;
-Judoca j3=NULL;
-
-
-Arbol a = create();
-
-a = agrega(a,"nombre","apellido",20,miComparar);
-a = agrega(a,"nombre2","apellido2",21,miComparar);
-a = agrega(a,"nombre3","apellido3",15,miComparar);
-
-printf("muestraPreOrder:\n");
-muestraPreOrder(a);
 }
