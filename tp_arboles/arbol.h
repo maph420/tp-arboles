@@ -2,9 +2,6 @@
 #ifndef __ARBOL_H__
 #define __ARBOL_H__
 #define LONGITUD_MAX_LINEA 255
-
-
-
 #include <stddef.h>
 
 typedef struct {
@@ -40,12 +37,12 @@ Arbol agrega_pareja(Arbol a, Judoca p1, Judoca p2, int estadoPareja, Comparar c)
 
 void muestraPreOrder(Arbol a);
 
-void muestraPreOrderParejas(Arbol a);
+void muestraPreOrderParejas(Arbol a); //borrar despues
 
 Arbol elimina(Arbol a, void* dato);
 
+typedef void (* Destruir ) ( void * dato ) ;
 
-void testJudoca();
-
+void arbol_destruir ( Arbol arbolN , Destruir d ) ;
 
 #endif /* __ARBOL_H__ */
