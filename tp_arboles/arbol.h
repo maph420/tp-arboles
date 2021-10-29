@@ -37,19 +37,14 @@ typedef int (*Comparar) ( void * dato1, int dato2 );
 
 typedef int(*CompararNodos) ( void* dato1, void* dato2 );
 
-
-Arbol agrega(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, Comparar c);
+Arbol agrega_judoca(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, Comparar c);
 
 Arbol agrega_pareja(Arbol a, Judoca p1, Judoca p2, int estadoPareja, Comparar c);
 
-void muestraPreOrder(Arbol a);
-
-void muestraPreOrderParejas(Arbol a); //borrar despues
-
 Arbol elimina(Arbol a, void* dato);
 
-typedef void (* Destruir ) ( void * dato ) ;
+typedef void (*Destruir) ( void* dato );
 
-void arbol_destruir ( Arbol arbolN , Destruir d ) ;
+void arbol_destruir (Arbol arbolN, Destruir d);
 
 #endif /* __ARBOL_H__ */
