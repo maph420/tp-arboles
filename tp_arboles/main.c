@@ -27,16 +27,16 @@ return ( (((Judoca)dato1)->edad) >= ((Judoca)dato2)->edad ) ? ((Judoca)dato1)->e
 
 int obtenerEstadoJudoca(void* j1, void* j2) {
     if ( ( ((Judoca)j1)->edad >= 18 && ((Judoca)j2)->edad < 18) || ( ((Judoca)j1)->edad < 18 && ((Judoca)j2)->edad >=18 ) )
-        return 1;
+        return PAREJA_ENTRE_MAYOR_Y_MENOR;
 
     else if ( ( ((Judoca)j1)->edad <18 && ((Judoca)j2)->edad <18 ) && (deltaEdades((Judoca)j1,(Judoca)j2) > 1) )
-        return 2;
+        return PAREJA_MENOR_EXCEDE_DIFERENCIA_EDAD;
 
     else if ( ( ((Judoca)j1)->edad >=18 && ((Judoca)j2)->edad >=18 ) && (deltaEdades((Judoca)j1,(Judoca)j2) > 2) ) 
-        return 3;  
+        return PAREJA_MAYOR_EXCEDE_DIFERENCIA_EDAD;  
 
     else 
-        return 0;
+        return PAREJA_VALIDA;
 }
 
 Pareja parejaMinDiferenciaEdad (Judoca nodoAComparar, Arbol a, Judoca mejorMatch) {
@@ -74,7 +74,7 @@ Pareja parejaMinDiferenciaEdad (Judoca nodoAComparar, Arbol a, Judoca mejorMatch
 void formarParejas(Arbol* a1, Arbol* a2, Arbol* a_resultante) {
     Judoca aux_match = NULL;
     Pareja pareja_formada = parejaMinDiferenciaEdad((Judoca)((*a1)->dato),*a2,aux_match);
-    if(pareja_formada == NULL) return; //se llego al maximo numero de parejas formadas (lo restante de a1 o de a2 se quedara sin pareja)
+    //if(pareja_formada == NULL) return; //se llego al maximo numero de parejas formadas (lo restante de a1 o de a2 se quedara sin pareja)
 
     *a_resultante = agrega_pareja(*a_resultante,pareja_formada->participante1,pareja_formada->participante2,pareja_formada->estadoPareja,funcionCompararParejas);
 
@@ -138,16 +138,41 @@ int esLineaDeEquipo=0;
     }
 
     if ( ! fclose(arch) )
-        printf("archivo leido joya\n\n");
+        printf("\nEl archivo se ha leido correctamente\n");
     else 
-        return -1; //archivo leido joyan't
+        return -1; //archivo no leido
 
     return 0;
 }
 
+
+
+char* mensajeEstado(estadoDePareja est) {
+    switch (est)
+    {
+    case PAREJA_ENTRE_MAYOR_Y_MENOR:
+        return "Pareja entre mayor y menor\n";
+    break;
+    case PAREJA_MENOR_EXCEDE_DIFERENCIA_EDAD:
+        return "Pareja de menores con mas de 1 año de diferencia\n";
+    break;
+    case PAREJA_MAYOR_EXCEDE_DIFERENCIA_EDAD:
+        return "Pareja de mayores con mas de 2 años de diferencia\n";
+    break;
+    case PAREJA_VALIDA:
+        return "Pareja Valida\n";
+    break;
+    default:
+        return NULL;
+        break;
+    }
+}
+
 void recorrer_y_guardar_pareja(Arbol arbolparejas, FILE* arch) {
     if (!isEmpty(arbolparejas)) {
-        fprintf(arch, "\t%s %s\t\t%10s\t\t%s %s\t\t%d\t\t\n",((Pareja)arbolparejas->dato)->participante1->nombre,((Pareja)arbolparejas->dato)->participante1->apellido,"vs",((Pareja)arbolparejas->dato)->participante2->nombre,((Pareja)arbolparejas->dato)->participante2->apellido,((Pareja)arbolparejas->dato)->estadoPareja);
+        estadoDePareja estado = ((Pareja)arbolparejas->dato)->estadoPareja;
+        char* mensajeEstadoPareja = mensajeEstado(estado);
+        fprintf(arch, "\t%s %s\t\t%10s\t\t%s %s\t\t%s\t\t\n",((Pareja)arbolparejas->dato)->participante1->nombre,((Pareja)arbolparejas->dato)->participante1->apellido,"vs",((Pareja)arbolparejas->dato)->participante2->nombre,((Pareja)arbolparejas->dato)->participante2->apellido,mensajeEstadoPareja);
         recorrer_y_guardar_pareja(arbolparejas->izq,arch);
         recorrer_y_guardar_pareja(arbolparejas->der,arch);
     }
@@ -180,7 +205,7 @@ void guardar_parejas(Arbol a1, Arbol a2, Arbol arbolparejas, char* archivo_salid
     }
 
          if ( ! fclose(arch))
-            printf("\nEl archivo se guardo con exito\n");
+            printf("\nEl archivo se ha guardado con exito\n");
             else printf("Hubo un problema al guardar el archivo.\n");
     }
     else printf("Hubo un problema al guardar el archivo.\n");
@@ -202,7 +227,7 @@ int main(int argc, char* argv[]) {
     formarParejas(&a1,&a2,&arbolparejas);
     guardar_parejas(a1,a2,arbolparejas,argv[2]);
 
-    printf("\nprograma retorna\n");
+    ///printf("\n...\n");
 }
 
 
