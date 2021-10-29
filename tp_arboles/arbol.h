@@ -22,6 +22,13 @@ typedef struct _TNodo {
 } TNodo;
 typedef TNodo* Arbol;
 
+typedef enum {
+  PAREJA_VALIDA,
+  PAREJA_ENTRE_MAYOR_Y_MENOR,
+  PAREJA_MENOR_EXCEDE_DIFERENCIA_EDAD,
+  PAREJA_MAYOR_EXCEDE_DIFERENCIA_EDAD
+} estadoDePareja;
+
 Arbol create();
 
 int isEmpty(Arbol a);
