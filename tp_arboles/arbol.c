@@ -21,49 +21,34 @@ int miComparaNodos(void* dato1, Judoca dato2) {
 	return (((Judoca)dato1)->edad > ((Judoca)dato2)->edad) ? 1 : 0 ;
 }
 
-
-void muestraPreOrder(Arbol a){
-	if (!isEmpty(a)) {
-    	printf("%s	%s	%d\n", ((Judoca)(a->dato))->nombre,((Judoca)(a->dato))->apellido,((Judoca)(a->dato))->edad);
-    	muestraPreOrder(a->izq);
-    	muestraPreOrder(a->der);
-  	}
-}
-
-void muestraPreOrderParejas(Arbol a){
-	if (!isEmpty(a)) {
-		printf("%s	vs	%s	(%d)\n",((Pareja)a->dato)->participante1->nombre,((Pareja)a->dato)->participante2->nombre,((Pareja)a->dato)->estadoPareja);
-		muestraPreOrderParejas(a->izq);
-		muestraPreOrderParejas(a->der);
-	}
-}
-
-
-
-Arbol agrega(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, Comparar c) { //Judoca es un puntero !!!, pasar datos como args separados
+Arbol agrega_judoca(Arbol a, char* judocaNombre, char* judocaApellido, int judocaEdad, Comparar c) {
 
 	if (isEmpty(a)) {
-        /*sizeof(Judoca) reservaria tamaño para el puntero a la estructura, no para la estructura :p*/
         Judoca j = malloc(sizeof(_Judoca));
         a = malloc(sizeof(TNodo));
-        j->nombre = strdup(judocaNombre);
-        j->apellido = strdup(judocaApellido);
+		j->nombre = malloc(sizeof(char)*(strlen(judocaNombre)+1));
+		strcpy(j->nombre,judocaNombre);
+		j->apellido = malloc(sizeof(char)*(strlen(judocaApellido)+1));
+		strcpy(j->apellido,judocaApellido);
         j->edad = judocaEdad;
 
         a->dato = j;
 	    a->izq = NULL;
 	    a->der = NULL;
+		free(j->nombre);
+		free(j->apellido);
+		free(j);
+		j=NULL;
   	}
 	else {
 		if (c(a->dato, judocaEdad)) 
-            a->izq = agrega(a->izq,judocaNombre,judocaApellido,judocaEdad,c);
+            a->izq = agrega_judoca(a->izq,judocaNombre,judocaApellido,judocaEdad,c);
 		else
-            a->der = agrega(a->der,judocaNombre,judocaApellido,judocaEdad,c);
+            a->der = agrega_judoca(a->der,judocaNombre,judocaApellido,judocaEdad,c);
 	}
 	return a;
 }
 
-//esto en main.c o arbol.c ?
 Arbol agrega_pareja(Arbol a, Judoca p1, Judoca p2, int estadoPareja, Comparar c) { 
 
 	if (isEmpty(a)) {
@@ -75,7 +60,10 @@ Arbol agrega_pareja(Arbol a, Judoca p1, Judoca p2, int estadoPareja, Comparar c)
 
         a->dato = p;
 	    a->izq = NULL;
-	    a->der = NULL; 
+	    a->der = NULL;
+		free(p->participante1);
+		free(p->participante2);
+		free(p); 
 
   	}
 	else {
@@ -118,7 +106,10 @@ Arbol elimina(Arbol a, void* dato) {
 	  if( ! strcmp(((Judoca)a->dato)->nombre,((Judoca)dato)->nombre) && ! strcmp(((Judoca)a->dato)->apellido,((Judoca)dato)->apellido)) {
 
   		//Caso 1: No tiene hijos
-  		if (isEmpty(a->izq) && isEmpty(a->der))	 {	 
+  		if (isEmpty(a->izq) && isEmpty(a->der))	 {
+			free(((Judoca)a->dato)->nombre);
+			free(((Judoca)a->dato)->apellido);	 
+			free(a->dato);
 			free(a);
   			a = NULL;
   			return a;
@@ -127,6 +118,9 @@ Arbol elimina(Arbol a, void* dato) {
   		//Caso 2: Un hijo 
   		else if (isEmpty(a->izq) || isEmpty(a->der)) {
   			Arbol t = (isEmpty(a->izq) ? a->der : a->izq);
+			free(((Judoca)a->dato)->nombre);
+			free(((Judoca)a->dato)->apellido);	 
+			free(a->dato);
 			free(a);
   			a = t;
   			return a;
@@ -145,4 +139,16 @@ Arbol elimina(Arbol a, void* dato) {
 
 }
   	return a;
+}
+
+// libera toda la memoria de un arbol independientemente de su tipo (Judoca o Pareja en este caso)
+void arbol_destruir (Arbol arbolN, Destruir d) {
+
+	if(!isEmpty(arbolN)) {
+		d((arbolN)->dato);
+		arbol_destruir(arbolN->izq,d);
+		arbol_destruir(arbolN->der,d);
+		free(arbolN);
+	}
+	
 }
